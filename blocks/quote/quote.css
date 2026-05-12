@@ -6,6 +6,16 @@
     margin: 1rem 0;
 }
 
+.block.quote > div:first-child p::before {
+    font-size: 4em;
+    content: open-quote;
+}
+
+.block.quote > div:first-child p::after {
+    font-size: 4em;
+    content: close-quote;
+}
+
 .block.quote blockquote {
     margin: 16px;
     text-indent: 0;
