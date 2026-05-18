@@ -2,5 +2,5 @@ export default function decorate(block) {
     const [wrapper] = block.children;
     const blockQuote = document.createElement('blockquote');
     blockQuote.textContent = wrapper.textContent.trim();
-    wrapper.replaceChildren(blockQuote);
+    block.replaceChild(blockQuote, wrapper);
 }
