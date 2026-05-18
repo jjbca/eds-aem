@@ -6,4 +6,18 @@
     margin: 1rem 0;
 }
 
+.block.callout.info {
+    border-left: 4px solid #0077cc;
+    background-color: rgb(197, 255, 255);
+}
+
+.block.callout.warning {
+    border-left: 4px solid #ff9900;
+    background-color: #fff3e0;
+}
+
+.block.callout.error {
+    border-left: 4px solid #cc0000;
+    background-color: #ffe0e0;
+}
 
