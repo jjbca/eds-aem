@@ -41,4 +41,8 @@
   content: url(../../icons/tip.svg);
 }
 
+.block.callout.error > div:first-child p::before {
+  content: url(../../icons/error.svg);
+}
+
 
