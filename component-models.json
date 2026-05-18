@@ -216,22 +216,46 @@
     ]
   },
   {
-    "id": "quote",
+    "id": "callout",
     "fields": [
-      {
-        "component": "richtext",
-        "name": "quote",
-        "value": "",
-        "label": "Quote",
-        "valueType": "string"
-      },
       {
         "component": "text",
         "valueType": "string",
-        "name": "author",
-        "label": "Author",
+        "name": "title",
+        "label": "Title",
         "value": ""
-      }
-    ]
-  }
-]
+      },
+      {
+        "component": "richtext",
+        "name": "content",
+        "value": "",
+        "label": "Content",
+        "valueType": "string"
+      },
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Callout type",
+        "value": "info",
+        "description": "Set the type of callout box. Warning and Error types should be used for important information that needs to be highlighted, while Tip and Info can be used for less critical information.",
+        "options": [
+          {
+            "name": "Warning",
+            "value": "warning"
+          },
+          {
+            "name": "Error",
+            "value": "error"
+          },
+          {
+            "name": "Tip",
+            "value": "tip"
+          },
+          {
+            "name": "Info",
+            "value": "info"
+          }
+        }
+      ]
+    }
+  ]
