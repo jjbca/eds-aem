@@ -1,48 +1,55 @@
 .block.callout {
-    background-color: #ccc;
-    padding: 0 0 24px;
-    display: flex;
-    flex-direction: column;
-    margin: 1rem 0;
+  background-color: #ccc;
+  padding: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0;
+  padding:6px;
 }
 
 .block.callout.info {
-    border-left: 4px solid #0077cc;
-    background-color: rgb(197, 255, 255);
+  border-left: 4px solid #0077cc;
+  background-color: rgb(171, 234, 255);
 }
 
 .block.callout.warning {
-    border-left: 4px solid #ff9900;
-    background-color: #fff3e0;
+  border-left: 4px solid #ff9900;
+  background-color: #fff3e0;
 }
 
 .block.callout.error {
-    border-left: 4px solid #cc0000;
-    background-color: #ffe0e0;
+  border-left: 4px solid #cc0000;
+  background-color: #ffe0e0;
 }
 
-.block.callout > div:first-child p::before {
-  display:inline-block;
-  vertical-align: top;
-  margin: 4px 8px 0 8px;
-  width: 20px;
-  height: 20px;
+.block.callout>div:first-child p {
+  font-weight: bold;
+} 
+
+
+.block.callout>div:first-child p::before {
+  content:"";
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  margin: 0px 8px 0 8px;
+  vertical-align: middle;
 }
 
-.block.callout.info > div:first-child p::before {
-  content: url(../../icons/info.svg);
+.block.callout.info>div:first-child p::before {
+  background-image: url(../../icons/info.svg);
 }
 
-.block.callout.warning > div:first-child p::before {
-  content: url(../../icons/warning.svg);
+.block.callout.tip>div:first-child p::before {
+  background-image: url(../../icons/tip.svg);
 }
 
-.block.callout.tip > div:first-child p::before {
-  content: url(../../icons/tip.svg);
+.block.callout.error>div:first-child p::before {
+  background-image: url(../../icons/error.svg);
 }
 
-.block.callout.error > div:first-child p::before {
-  content: url(../../icons/error.svg);
+.block.callout.warning>div:first-child p::before {
+  background-image: url(../../icons/warning.svg);
 }
-
-
