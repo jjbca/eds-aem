@@ -1,0 +1,9 @@
+.block.callout {
+    background-color: #ccc;
+    padding: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
+}
+
+
