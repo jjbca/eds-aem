@@ -236,7 +236,7 @@
         "component": "select",
         "name": "classes",
         "label": "Callout type",
-        "value": "",
+        "value": "info",
         "description": "Set the type of callout box. Warning and Error types should be used for important information that needs to be highlighted, while Tip and Info can be used for less critical information.",
         "options": [
           {
