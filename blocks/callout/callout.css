@@ -21,7 +21,7 @@
     background-color: #ffe0e0;
 }
 
-.block.callout.info > p::before {
+.block.callout.info p::before {
   content: url(../../icons/info.svg);
   width: 32px;
   height: 32px;
