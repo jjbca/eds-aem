@@ -254,6 +254,10 @@
           {
             "name": "Info",
             "value": "info"
+          },
+          {
+            "name": "Note",
+            "value": "note"
           }
         ]
       }
