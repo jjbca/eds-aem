@@ -55,7 +55,7 @@
 }
 
 .block.callout.info > div:first-child p::before {
-  background-image: url(../../icons/info.svg);
+  background-image: url("../../icons/info.svg");
 }
 
 /* Warning (orange) */
@@ -75,7 +75,7 @@
 }
 
 .block.callout.warning > div:first-child p::before {
-  background-image: url(../../icons/warning.svg);
+  background-image: url("../../icons/warning.svg");
 }
 
 /* Error (red) */
@@ -95,7 +95,7 @@
 }
 
 .block.callout.error > div:first-child p::before {
-  background-image: url(../../icons/error.svg);
+  background-image: url("../../icons/error.svg");
 }
 
 /* Tip (green) */
@@ -115,7 +115,7 @@
 }
 
 .block.callout.tip > div:first-child p::before {
-  background-image: url(../../icons/tip.svg);
+  background-image: url("../../icons/tip.svg");
 }
 
 /* Note (grey) */
@@ -135,5 +135,5 @@
 }
 
 .block.callout.note > div:first-child p::before {
-  background-image: url(../../icons/note.svg);
+  background-image: url("../../icons/note.svg");
 }

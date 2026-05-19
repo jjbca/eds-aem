@@ -1,0 +1,73 @@
+main .quote {
+  position: relative;
+  background-color: #f0f4ff;
+  border: 1px solid #dde5f8;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgb(80 100 160 / 12%);
+  padding: 4.5rem 1.5rem 1.75rem;
+  margin: 2rem auto;
+  max-width: 760px;
+}
+
+main .quote::before {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  width: 3rem;
+  height: 2.25rem;
+  background-image: url("../../icons/quote.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+main .quote > div:first-child p {
+  font-style: italic;
+  text-align: center;
+  font-size: var(--body-font-size-m);
+  line-height: 1.7;
+  color: var(--text-color);
+  margin: 0;
+}
+
+main .quote > div:nth-child(2) {
+  margin-top: 1.25rem;
+}
+
+main .quote > div:nth-child(2) p {
+  text-align: right;
+  font-size: var(--body-font-size-s);
+  color: var(--dark-color);
+  margin: 0;
+}
+
+main .quote > div:nth-child(2) p::before {
+  content: '— ';
+}
+
+@media (width >= 600px) {
+  main .quote {
+    padding: 5rem 2.5rem 2rem;
+  }
+
+  main .quote::before {
+    width: 3.5rem;
+    height: 2.75rem;
+    top: 1.25rem;
+    left: 1.5rem;
+  }
+}
+
+@media (width >= 900px) {
+  main .quote {
+    padding: 5.5rem 3.5rem 2.5rem;
+  }
+
+  main .quote::before {
+    width: 4.5rem;
+    height: 3.5rem;
+    top: 1.5rem;
+    left: 2rem;
+  }
+}
