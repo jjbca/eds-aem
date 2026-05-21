@@ -1,6 +1,7 @@
+TOKEN=$(cat .tokens)
 curl -v -X POST https://json2html.adobeaem.workers.dev/config/jjbca/eds-aem/main \
   -H "Content-Type: application/json" \
-  -H "Authorization: token *****" \
+  -H "Authorization: token $TOKEN" \
   -d '[
   {
     "path": "/events/list",
