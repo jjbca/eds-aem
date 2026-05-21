@@ -2,7 +2,8 @@
   "mappings": [
     "/content/jca-eds-aem/:/",
     "/content/jca-eds-aem/configuration:/.helix/config.json",
-    "/content/jca-eds-aem/metadata:/metadata.json"
+    "/content/jca-eds-aem/metadata:/metadata.json",
+    "/content/jca-eds-aem/coming-events:/coming-events.json"
   ],
   "includes": [
     "/content/jca-eds-aem/"
