@@ -5,12 +5,12 @@ curl -v -X POST https://json2html.adobeaem.workers.dev/config/jjbca/eds-aem/main
   -d '[
   {
     "path": "/events/list",
-    "endpoint": "https://main--eds-aem--jjbca.aem.page/events-list.json",
+    "endpoint": "https://main--eds-aem--jjbca.aem.page/coming-events.json",
     "template": "/templates/events-template.html"
   },
   {
     "path": "/events/",
-    "endpoint": "https://main--eds-aem--jjbca.aem.page/events-list.json",
+    "endpoint": "https://main--eds-aem--jjbca.aem.page/coming-events.json",
     "arrayKey": "data",
     "pathKey": "url",
     "template": "/templates/event-template.html"
