@@ -1,12 +1,14 @@
 <html>
-<head><title>Test</title></head>
+<head><title>Coming Events</title></head>
 <body>
   <main>
     <div>
-      <h1>Event Count: {{total}}</h1>
       {{#data}}
-        <div>
+        <div class="event">
           <h2>{{name}}</h2>
+          <picture>
+            <img src="{{image}}" alt="{{name}} in {{location}}">
+          </picture>
           <a href="{{url}}">More Info</a>
         </div>
       {{/data}}
