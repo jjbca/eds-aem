@@ -279,5 +279,18 @@
         ]
       }
     ]
+  },
+  {
+    "id": "blog-card",
+    "fields": [
+      {
+        "component": "aem-content-fragment",
+        "valueType": "string",
+        "name": "Content Fragment",
+        "label": "Content Fragment",
+        "multi": false,
+        "validation.rootPath": "/content/dam/jca-eds-aem/blog-posts"
+      }
+    ]
   }
 ]
