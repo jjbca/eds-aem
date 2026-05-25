@@ -29,6 +29,8 @@ export default class GraphQLClient {
       },
     });
 
+    console.log(response);
+
     if (!response.ok) {
       throw new Error(`Failed to fetch Content Fragment: ${response.status} ${response.statusText}`);
     }

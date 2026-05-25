@@ -53,7 +53,7 @@ function extractFragmentPath(block) {
 }
 
 async function fetchFragmentByPath(fragmentPath) {
-  return GraphQLClient.new('/global/path').findItems({ path: fragmentPath });
+  return GraphQLClient.new('/global/by-path').findItems({ path: fragmentPath });
 }
 
 function renderBlogCard(fragment) {
