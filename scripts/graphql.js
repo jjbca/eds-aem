@@ -27,15 +27,20 @@ export default class GraphQLClient {
       headers: {
         Accept: 'application/json',
       },
-    }).json();
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch Content Fragment: ${response.status} ${response.statusText}`);
     }
 
-    const root = Object.values(response)[0]; // unwrap first key
+    const json = await response.json();
+
+    const root = Object.values(json)[0]; // unwrap first key
 
     // Unwrap "item" (singular) or "items" (list)
-    return root?.item ?? root?.items ?? root;
+    console.log(root);
+    const result = Object.values(root)[0]?.item ?? Object.values(root)[0]?.items ?? root;
+    console.log(result);
+    return result;
   }
 }
