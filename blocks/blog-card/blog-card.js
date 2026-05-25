@@ -37,15 +37,8 @@ function formatDate(dateValue) {
 }
 
 function extractFragmentPath(block) {
-  // Adjust this based on your authored block structure.
-  // Example for a 2-row block table conversion:
-  // row 0 = block label
-  // row 1 = selected CF path
-  const secondRow = block.children[1];
-  const raw = secondRow?.textContent?.trim();
-
   // If UE persisted a clickable DAM link instead, prefer href:
-  const link = secondRow?.querySelector('a');
+  const link = block.querySelector('a');
   if (link?.href) {
     try {
       const url = new URL(link.href);
@@ -55,12 +48,12 @@ function extractFragmentPath(block) {
     }
   }
 
-  return raw;
+  return 'nolink';
 }
 
 async function fetchFragmentByPath(fragmentPath) {
-  const url = `${AEM_HOST}/adobe/contentFragments?path=${encodeURIComponent(fragmentPath)}`;
-
+  const url = `${AEM_HOST}/graphql/execute.json/global/by-path;path=${fragmentPath}`;
+  
   const resp = await fetch(url, {
     headers: {
       Accept: 'application/json',
@@ -72,9 +65,10 @@ async function fetchFragmentByPath(fragmentPath) {
   }
 
   const json = await resp.json();
-
+  
   // When path identifies a single fragment, take the first returned item.
-  const fragment = json.items?.[0];
+  const fragment = json.data?.blogPostList?.items?.[0];
+  console.log('Fetched fragment data:', fragment);
   if (!fragment) {
     throw new Error(`No Content Fragment found for path: ${fragmentPath}`);
   }
