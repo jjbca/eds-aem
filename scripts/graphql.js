@@ -1,9 +1,41 @@
 const AEM_HOST = 'https://publish-p178261-e1872848.adobeaemcloud.com';
 
-class GraphQLClient {
+export default class GraphQLClient {
   constructor(host, configPath) {
     this.host = host;
     this.configPath = configPath;
   }
-}
 
+  static new(configPath) {
+    return new GraphQLClient(AEM_HOST, configPath);
+  }
+
+  #buildURL() {
+    return `${this.host}/graphql/execute.json${this.configPath}`;
+  }
+
+  static #convertParamsToQueryString(params) {
+    // conversion consists in ';' separated key=value pairs, where value is URI encoded
+    return Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(';');
+  }
+
+  async findItems(params) {
+    const url = `${this.#buildURL()};${GraphQLClient.#convertParamsToQueryString(params)}`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: 'application/json',
+      },
+    }).json();
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Content Fragment: ${response.status} ${response.statusText}`);
+    }
+
+    const root = Object.values(response)[0]; // unwrap first key
+
+    // Unwrap "item" (singular) or "items" (list)
+    return root?.item ?? root?.items ?? root;
+  }
+}

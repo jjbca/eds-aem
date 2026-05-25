@@ -14,7 +14,8 @@
  * - CORS is configured so your EDS site can call the AEM Publish/Preview host
  */
 
-const AEM_HOST = 'https://publish-p178261-e1872848.adobeaemcloud.com';
+// import graphql client
+import GraphQLClient from '../../scripts/graphql.js';
 
 function escapeHtml(str = '') {
   return String(str)
@@ -52,28 +53,7 @@ function extractFragmentPath(block) {
 }
 
 async function fetchFragmentByPath(fragmentPath) {
-  const url = `${AEM_HOST}/graphql/execute.json/global/by-path;path=${fragmentPath}`;
-  
-  const resp = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-
-  if (!resp.ok) {
-    throw new Error(`Failed to fetch Content Fragment: ${resp.status} ${resp.statusText}`);
-  }
-
-  const json = await resp.json();
-  
-  // When path identifies a single fragment, take the first returned item.
-  const fragment = json.data?.blogPostList?.items?.[0];
-  console.log('Fetched fragment data:', fragment);
-  if (!fragment) {
-    throw new Error(`No Content Fragment found for path: ${fragmentPath}`);
-  }
-
-  return fragment;
+  return GraphQLClient.new('/global/by-path').findItems({ path: fragmentPath });
 }
 
 function renderBlogCard(fragment) {
