@@ -42,7 +42,9 @@ function extractFragmentPath(block) {
   const link = block.querySelector('a');
   if (link?.href) {
     try {
-      const url = new URL(link.href);
+      // remove .html suffix if present, and decode URI
+      const fragmentPath = link.href.replace(/\.html$/, '');
+      const url = new URL(fragmentPath);
       return decodeURIComponent(url.pathname);
     } catch {
       return link.getAttribute('href');
