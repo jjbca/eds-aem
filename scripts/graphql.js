@@ -7,7 +7,6 @@ export default class GraphQLClient {
   }
 
   static new(configPath) {
-    console.log(`Creating GraphQL client with config path: ${configPath}`);
     return new GraphQLClient(AEM_HOST, configPath);
   }
 
@@ -16,6 +15,7 @@ export default class GraphQLClient {
   }
 
   static #convertParamsToQueryString(params) {
+    console.log(params);
     // conversion consists in ';' separated key=value pairs, where value is URI encoded
     return Object.entries(params)
       .map(([key, value]) => `${key}=${value}`)
