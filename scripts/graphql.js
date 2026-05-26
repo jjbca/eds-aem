@@ -7,6 +7,7 @@ export default class GraphQLClient {
   }
 
   static new(configPath) {
+    console.log(`Creating GraphQL client with config path: ${configPath}`);
     return new GraphQLClient(AEM_HOST, configPath);
   }
 
