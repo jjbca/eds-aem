@@ -11,3 +11,8 @@
   transition:box-shadow 0.3s ease;  
 }
 
+.blog-card-container::after {
+  content: "";
+  display: table;
+  clear: both;
+}
