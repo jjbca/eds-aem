@@ -59,22 +59,21 @@ async function fetchFragmentByPath(fragmentPath) {
 }
 
 function renderBlogCard(fragment) {
-  const fields = fragment.fields || {};
+  // set a local variable title or empty string from fragment
+  const title = fragment.title ?? '';
+  const summary = fragment.summary?.html ?? '';
 
-  const title = fields.title || fragment.title || '';
-  const summary = fields.summary?.value ?? fields.summary ?? '';
-
-  const author = fields.author || '';
-  const date = fields.date || '';
-  const tags = Array.isArray(fields.tags) ? fields.tags : [];
+  const author = fragment.author ?? '';
+  const date = fragment.date || '';
+  const tags = Array.isArray(fragment.tags) ? fragment.tags : [];
 
   return `
-    <article class="blog-card">
+    <article>
       <div class="blog-card-body">
         ${date ? `<p class="blog-card-date">${escapeHtml(formatDate(date))}</p>` : ''}
         ${title ? `<h3 class="blog-card-title">${escapeHtml(title)}</h3>` : ''}
         ${author ? `<p class="blog-card-author">By ${escapeHtml(author)}</p>` : ''}
-        ${summary ? `<p class="blog-card-summary">${escapeHtml(summary)}</p>` : ''}
+        ${summary ? `<p class="blog-card-summary">${summary}</p>` : ''}
         ${tags.length
     ? `
               <ul class="blog-card-tags">

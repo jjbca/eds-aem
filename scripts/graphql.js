@@ -15,7 +15,6 @@ export default class GraphQLClient {
   }
 
   static #convertParamsToQueryString(params) {
-    console.log(params);
     // conversion consists in ';' separated key=value pairs, where value is URI encoded
     return Object.entries(params)
       .map(([key, value]) => `${key}=${value}`)
@@ -30,8 +29,6 @@ export default class GraphQLClient {
       },
     });
 
-    console.log(response);
-
     if (!response.ok) {
       throw new Error(`Failed to fetch Content Fragment: ${response.status} ${response.statusText}`);
     }
@@ -41,9 +38,7 @@ export default class GraphQLClient {
     const root = Object.values(json)[0]; // unwrap first key
 
     // Unwrap "item" (singular) or "items" (list)
-    console.log(root);
     const result = Object.values(root)[0]?.item ?? Object.values(root)[0]?.items ?? root;
-    console.log(result);
     return result;
   }
 }

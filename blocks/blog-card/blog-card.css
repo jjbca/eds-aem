@@ -1,0 +1,11 @@
+.blog-card {
+  width: 250px;
+  border:1px solid #ccc;
+  background-color: #fff;
+  border-radius:18px;
+  padding:16px;
+  margin:4px;
+  box-shadow:0px 2px 20px rgba(0,0,0,0.2);
+  transition:box-shadow 0.3s ease;  
+}
+
