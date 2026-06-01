@@ -1,4 +1,5 @@
 .blog-card {
+  float:left;
   width: 250px;
   border:1px solid #ccc;
   background-color: #fff;
