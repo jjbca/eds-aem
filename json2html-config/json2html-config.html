@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON2HTML Worker Config</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e1e4e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 14px 24px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    header h1 { font-size: 17px; font-weight: 600; color: #c9d1d9; }
+    header .subtitle { font-size: 13px; color: #6e7681; }
+
+    .main { display: flex; flex: 1; min-height: 0; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 300px;
+      flex-shrink: 0;
+      background: #161b22;
+      border-right: 1px solid #30363d;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6e7681;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8b949e;
+    }
+
+    input[type="text"], input[type="password"] {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-size: 13px;
+      padding: 7px 10px;
+      width: 100%;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { outline: none; border-color: #58a6ff; box-shadow: 0 0 0 3px #58a6ff22; }
+    input.field-error { border-color: #f85149 !important; }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: #8b949e;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-row input[type="checkbox"] {
+      accent-color: #58a6ff;
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
+    }
+
+    .endpoint-box {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 9px 10px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 11px;
+      color: #6e7681;
+      word-break: break-all;
+      line-height: 1.7;
+    }
+
+    .endpoint-box .seg { color: #58a6ff; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+    .btn-primary  { background: #238636; border-color: #2ea043; color: #fff; }
+    .btn-primary:hover  { background: #2ea043; }
+    .btn-secondary { background: #21262d; border-color: #30363d; color: #c9d1d9; }
+    .btn-secondary:hover { background: #30363d; }
+    .btn-full { width: 100%; }
+
+    /* ── Main content ── */
+    .content {
+      flex: 1;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+      overflow-y: auto;
+    }
+
+    /* Alerts */
+    .alert {
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .alert-body strong { display: block; font-weight: 600; margin-bottom: 2px; }
+    .alert-body p { opacity: 0.85; }
+    .alert-hint { margin-top: 5px; font-size: 11px; opacity: 0.65; font-style: italic; }
+
+    .alert-success { background: #1b2e1b; border: 1px solid #2ea04355; color: #3fb950; }
+    .alert-info    { background: #1f2d3d; border: 1px solid #58a6ff44; color: #79c0ff; }
+    .alert-warning { background: #2e2000; border: 1px solid #d2992266; color: #e3b341; }
+    .alert-error   { background: #2d1115; border: 1px solid #f8514966; color: #ff7b72; }
+
+    /* Editor header */
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .editor-left { display: flex; align-items: center; gap: 14px; }
+
+    .editor-title { font-size: 14px; font-weight: 600; color: #c9d1d9; }
+
+    /* Status pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #8b949e;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6e7681;
+      flex-shrink: 0;
+    }
+
+    .status-dot.ok     { background: #3fb950; }
+    .status-dot.warn   { background: #e3b341; }
+    .status-dot.err    { background: #f85149; }
+    .status-dot.spin   {
+      background: transparent;
+      border: 2px solid #30363d;
+      border-top-color: #58a6ff;
+      animation: spin 0.55s linear infinite;
+    }
+
+    .editor-actions { display: flex; gap: 8px; }
+
+    /* Textarea */
+    .editor-wrap { flex: 1; display: flex; flex-direction: column; min-height: 320px; }
+
+    textarea#config-editor {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 14px;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+
+    textarea#config-editor:focus { outline: none; border-color: #58a6ff; box-shadow: 0 0 0 3px #58a6ff22; }
+    textarea#config-editor.json-error { border-color: #f85149; box-shadow: 0 0 0 3px #f8514922; }
+    textarea#config-editor:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .json-error-msg {
+      font-size: 12px;
+      color: #f85149;
+      margin-top: 5px;
+      font-family: 'SF Mono', monospace;
+      min-height: 18px;
+    }
+
+    /* Save row */
+    .save-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .save-hint { font-size: 12px; color: #6e7681; }
+
+    .hidden { display: none !important; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Spinner inside button */
+    .btn-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.55s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* Fixed error toast */
+    #error-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2d1115;
+      border: 1px solid #f8514988;
+      color: #ff7b72;
+      padding: 13px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+      z-index: 9999;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transform: translateX(calc(100% + 40px));
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+      pointer-events: none;
+    }
+
+    #error-toast.show {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #toast-close {
+      background: none;
+      border: none;
+      color: #ff7b72;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+      padding: 0;
+      margin-top: -2px;
+      opacity: 0.7;
+    }
+
+    #toast-close:hover { opacity: 1; }
+
+    /* Code block inside alerts */
+    .alert pre.worker-fix {
+      margin-top: 10px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #c9d1d9;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .alert code {
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 12px;
+    }
+
+    /* CORS / file:// banner */
+    .cors-banner {
+      background: #2e2000;
+      border-bottom: 2px solid #d2992288;
+      color: #e3b341;
+      padding: 12px 24px;
+      font-size: 13px;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .cors-banner strong { font-weight: 700; }
+
+    .cors-banner code {
+      display: inline-block;
+      background: #3d2e00;
+      border: 1px solid #d2992255;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: all;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .cors-banner code:hover { background: #4d3b00; }
+    .cors-banner code:active { background: #1a1400; }
+
+    .cors-banner .copy-hint {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>JSON2HTML Worker Config</h1>
+  <span class="subtitle">Route configuration admin</span>
+</header>
+
+<div id="error-toast">
+  <span id="toast-msg"></span>
+  <button id="toast-close" title="Dismiss" onclick="hideToast()">×</button>
+</div>
+
+<div id="cors-banner" class="cors-banner hidden">
+  <span style="font-size:18px;flex-shrink:0">⚠</span>
+  <div>
+    <strong>Open this page through the local proxy server — do not open it as a file.</strong><br>
+    Run this command in the <code>json2html-config</code> folder, then open the URL it prints:
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <code id="cmd-server" title="Click to copy" onclick="copyCmd('cmd-server')">node server.js</code>
+      <span style="opacity:0.6">→ open</span>
+      <code id="cmd-url" title="Click to copy" onclick="copyCmd('cmd-url')">http://localhost:3000</code>
+    </div>
+    <span id="copy-feedback" style="font-size:11px;opacity:0;transition:opacity 0.3s;margin-left:4px">Copied!</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="section-label">Connection</div>
+
+    <div class="field-group">
+      <label for="f-org">Organization</label>
+      <input type="text" id="f-org" placeholder="e.g. jjbca" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field-group">
+      <label for="f-website">Website ID</label>
+      <input type="text" id="f-website" placeholder="e.g. eds-aem" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field-group">
+      <label for="f-branch">Git Branch</label>
+      <input type="text" id="f-branch" placeholder="e.g. main" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field-group">
+      <label for="f-token">Auth Token</label>
+      <input type="password" id="f-token" placeholder="your bearer token" autocomplete="off" spellcheck="false">
+    </div>
+
+    <label class="remember-row">
+      <input type="checkbox" id="f-remember"> Save credentials in browser
+    </label>
+
+    <div class="field-group">
+      <label>Endpoint URL</label>
+      <div class="endpoint-box" id="endpoint-box">—</div>
+    </div>
+
+    <button class="btn btn-primary btn-full" id="load-btn">&#8635;&nbsp; Load Configuration</button>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main class="content">
+
+    <div id="alert-area"></div>
+
+    <div class="editor-header">
+      <div class="editor-left">
+        <span class="editor-title">Configuration JSON</span>
+        <div class="status-pill">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Not connected</span>
+        </div>
+      </div>
+      <div class="editor-actions">
+        <button class="btn btn-secondary" id="format-btn" disabled>Format JSON</button>
+        <button class="btn btn-secondary" id="reset-btn" disabled>Reset</button>
+      </div>
+    </div>
+
+    <div class="editor-wrap">
+      <textarea id="config-editor" disabled placeholder="Load a configuration to start editing…"></textarea>
+    </div>
+    <div class="json-error-msg" id="json-error-msg"></div>
+
+    <div class="save-row">
+      <button class="btn btn-primary" id="save-btn" disabled>Save Configuration</button>
+      <span class="save-hint" id="save-hint">Load a configuration first</span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Requests go to the local proxy (same origin → no CORS).
+  // The sidebar displays the real worker URL for reference.
+  const FETCH_BASE   = '/config';
+  const DISPLAY_BASE = 'https://json2html.adobeaem.workers.dev/config';
+
+  const fOrg     = document.getElementById('f-org');
+  const fWebsite = document.getElementById('f-website');
+  const fBranch  = document.getElementById('f-branch');
+  const fToken   = document.getElementById('f-token');
+  const fRemember = document.getElementById('f-remember');
+  const endpointBox = document.getElementById('endpoint-box');
+  const loadBtn   = document.getElementById('load-btn');
+  const formatBtn = document.getElementById('format-btn');
+  const resetBtn  = document.getElementById('reset-btn');
+  const saveBtn   = document.getElementById('save-btn');
+  const editor    = document.getElementById('config-editor');
+  const alertArea = document.getElementById('alert-area');
+  const statusDot = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  const jsonErrMsg = document.getElementById('json-error-msg');
+  const saveHint  = document.getElementById('save-hint');
+
+  let lastGoodConfig = null; // last successfully loaded raw JSON string
+
+  // ── Persistence ──────────────────────────────────────────────────────────────
+
+  function persistCredentials() {
+    ['org', 'website', 'branch', 'token'].forEach(k => {
+      localStorage.setItem(`j2h_${k}`, document.getElementById(`f-${k}`).value);
+    });
+    localStorage.setItem('j2h_remember', '1');
+  }
+
+  function wipeCredentials() {
+    ['org', 'website', 'branch', 'token', 'remember'].forEach(k => localStorage.removeItem(`j2h_${k}`));
+  }
+
+  function restoreCredentials() {
+    if (localStorage.getItem('j2h_remember') !== '1') return;
+    fOrg.value     = localStorage.getItem('j2h_org')     || '';
+    fWebsite.value = localStorage.getItem('j2h_website') || '';
+    fBranch.value  = localStorage.getItem('j2h_branch')  || '';
+    fToken.value   = localStorage.getItem('j2h_token')   || '';
+    fRemember.checked = true;
+  }
+
+  // ── Endpoint display ──────────────────────────────────────────────────────────
+
+  function buildUrl() {
+    const o = fOrg.value.trim();
+    const w = fWebsite.value.trim();
+    const b = fBranch.value.trim();
+    if (!o && !w && !b) return null;
+    return `${FETCH_BASE}/${o || '{org}'}/${w || '{website-id}'}/${b || '{branch}'}`;
+  }
+
+  function refreshEndpoint() {
+    const o = fOrg.value.trim();
+    const w = fWebsite.value.trim();
+    const b = fBranch.value.trim();
+    if (!o && !w && !b) { endpointBox.innerHTML = '—'; return; }
+    const segs = [o || '{org}', w || '{website-id}', b || '{branch}'];
+    const prefix = DISPLAY_BASE + '/';
+    endpointBox.innerHTML = `<span style="color:#6e7681">${prefix}</span>${segs.map(s => `<span class="seg">${s}</span>`).join('<span style="color:#6e7681">/</span>')}`;
+  }
+
+  [fOrg, fWebsite, fBranch].forEach(el => el.addEventListener('input', () => {
+    refreshEndpoint();
+    el.classList.remove('field-error');
+  }));
+  fToken.addEventListener('input', () => fToken.classList.remove('field-error'));
+
+  // ── Status ────────────────────────────────────────────────────────────────────
+
+  function setStatus(type, text) {
+    // type: '' | 'ok' | 'warn' | 'err' | 'spin'
+    statusDot.className = 'status-dot' + (type ? ' ' + type : '');
+    statusText.textContent = text;
+  }
+
+  // ── Alerts ────────────────────────────────────────────────────────────────────
+
+  function clearAlert() { alertArea.innerHTML = ''; }
+
+  function showAlert(type, title, body, hint) {
+    const icons = { success: '✓', info: 'i', warning: '!', error: '✕' };
+    alertArea.innerHTML = `
+      <div class="alert alert-${type}">
+        <span class="alert-icon">${icons[type] || 'i'}</span>
+        <div class="alert-body">
+          <strong>${esc(title)}</strong>
+          ${body ? `<p>${esc(body)}</p>` : ''}
+          ${hint ? `<p class="alert-hint">Tip: ${esc(hint)}</p>` : ''}
+        </div>
+      </div>`;
+    alertArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Shown for rich alerts (e.g. CORS with code block) — takes raw HTML for body.
+  function showAlertRaw(type, title, bodyHtml) {
+    const icons = { success: '✓', info: 'i', warning: '!', error: '✕' };
+    alertArea.innerHTML = `
+      <div class="alert alert-${type}">
+        <span class="alert-icon">${icons[type] || 'i'}</span>
+        <div class="alert-body">
+          <strong>${esc(title)}</strong>
+          ${bodyHtml}
+        </div>
+      </div>`;
+    alertArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Toast: always visible regardless of scroll position.
+  let _toastTimer = null;
+  function showToast(msg) {
+    document.getElementById('toast-msg').textContent = msg;
+    const t = document.getElementById('error-toast');
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(hideToast, 10000);
+  }
+  function hideToast() {
+    document.getElementById('error-toast').classList.remove('show');
+  }
+
+  // Rich CORS preflight error with worker fix code.
+  function showCorsPreflightError() {
+    const workerCode = [
+      '// At the top of your Worker fetch handler:',
+      'if (request.method === "OPTIONS") {',
+      '  return new Response(null, {',
+      '    headers: {',
+      '      "Access-Control-Allow-Origin": "*",',
+      '      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",',
+      '      "Access-Control-Allow-Headers": "Authorization, Content-Type",',
+      '      "Access-Control-Max-Age": "86400",',
+      '    },',
+      '  });',
+      '}',
+      '',
+      '// Also add to every real response before returning it:',
+      'response.headers.set("Access-Control-Allow-Origin", "*");',
+    ].join('\n');
+
+    showAlertRaw('error', 'CORS preflight blocked — fix required in the Cloudflare Worker', `
+      <p>The browser sent an <code>OPTIONS</code> preflight before attaching the
+         <code>Authorization</code> header. Your worker returned no
+         <code>Access-Control-Allow-*</code> headers, so the browser cancelled
+         the request. <em>curl</em> skips this preflight entirely, which is why
+         it works.</p>
+      <p style="margin-top:8px">Add the following to your Cloudflare Worker's
+         <code>fetch</code> handler:</p>
+      <pre class="worker-fix">${esc(workerCode)}</pre>
+      <p class="alert-hint">After deploying the worker change, reload this page — no other changes needed here.</p>
+    `);
+    showToast('CORS preflight blocked — see the error panel for the worker fix');
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // ── Field validation ──────────────────────────────────────────────────────────
+
+  function validateFields() {
+    let ok = true;
+    const required = [fOrg, fWebsite, fBranch, fToken];
+    required.forEach(el => el.classList.remove('field-error'));
+    required.forEach(el => {
+      if (!el.value.trim()) { el.classList.add('field-error'); ok = false; }
+    });
+    return ok;
+  }
+
+  // ── JSON helpers ──────────────────────────────────────────────────────────────
+
+  function tryParse(str) {
+    try { return { ok: true, val: JSON.parse(str) }; }
+    catch (e) { return { ok: false, err: e.message }; }
+  }
+
+  function prettyPrint(val) { return JSON.stringify(val, null, 2); }
+
+  // ── JSON error indicator ──────────────────────────────────────────────────────
+
+  function showJsonErr(msg) {
+    editor.classList.add('json-error');
+    jsonErrMsg.textContent = '⚠ ' + msg;
+    saveBtn.disabled = true;
+    saveHint.textContent = 'Fix JSON errors to enable save';
+  }
+
+  function clearJsonErr() {
+    editor.classList.remove('json-error');
+    jsonErrMsg.textContent = '';
+    saveBtn.disabled = false;
+    saveHint.textContent = '';
+  }
+
+  // ── Editor state ──────────────────────────────────────────────────────────────
+
+  function enableEditor() {
+    editor.disabled = false;
+    formatBtn.disabled = false;
+    resetBtn.disabled = false;
+    clearJsonErr();
+  }
+
+  function disableEditor() {
+    editor.disabled = true;
+    formatBtn.disabled = true;
+    resetBtn.disabled = true;
+    saveBtn.disabled = true;
+    saveHint.textContent = 'Load a configuration first';
+  }
+
+  // ── Loading/saving button states ──────────────────────────────────────────────
+
+  function setLoading(on) {
+    loadBtn.disabled = on;
+    loadBtn.innerHTML = on
+      ? '<span class="btn-spinner"></span> Loading…'
+      : '&#8635;&nbsp; Load Configuration';
+  }
+
+  function setSaving(on) {
+    saveBtn.disabled = on;
+    loadBtn.disabled = on;
+    saveBtn.innerHTML = on
+      ? '<span class="btn-spinner"></span> Saving…'
+      : 'Save Configuration';
+  }
+
+  // ── Load ──────────────────────────────────────────────────────────────────────
+
+  loadBtn.addEventListener('click', async () => {
+    clearAlert();
+    if (!validateFields()) {
+      showAlert('warning', 'Missing fields', 'Fill in all four connection fields before loading.', 'All fields (Org, Website ID, Branch, Token) are required.');
+      return;
+    }
+
+    if (fRemember.checked) persistCredentials(); else wipeCredentials();
+
+    const url = buildUrl();
+    setLoading(true);
+    setStatus('spin', 'Connecting…');
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `token ${fToken.value.trim()}`,
+        },
+      });
+
+      if (res.status === 200) {
+        const data = await res.json();
+        const pretty = prettyPrint(data);
+        lastGoodConfig = pretty;
+        editor.value = pretty;
+        enableEditor();
+        setStatus('ok', 'Connected — config loaded');
+        const routeCount = Array.isArray(data) ? `${data.length} route(s)` : 'config';
+        showAlert('success', 'Configuration loaded', `Found ${routeCount} at this endpoint.`);
+
+      } else if (res.status === 404) {
+        lastGoodConfig = '[]';
+        editor.value = '[\n\n]';
+        enableEditor();
+        setStatus('warn', 'No config yet');
+        showAlert('warning', 'No configuration found (404)', 'This endpoint has no configuration yet.', 'Edit the JSON below and click Save to create one.');
+
+      } else if (res.status === 401 || res.status === 403) {
+        disableEditor();
+        setStatus('err', `Auth error (${res.status})`);
+        showAlert('error', `Authentication failed (${res.status})`, 'The worker rejected your token.', 'Check the token value and that it has the right permissions. Regenerate it if needed.');
+        fToken.classList.add('field-error');
+        fToken.focus();
+
+      } else {
+        disableEditor();
+        setStatus('err', `Error ${res.status}`);
+        let body = '';
+        try { body = await res.text(); } catch (_) { /* ignore */ }
+        showAlert('error', `Unexpected response (${res.status})`, body || 'The worker returned an unexpected status.', 'Check the worker deployment and inspect the browser Network tab for details.');
+      }
+
+    } catch (err) {
+      disableEditor();
+      setStatus('err', 'Connection failed');
+      if (location.protocol === 'file:') {
+        showAlert('error', 'CORS error — page opened as file://',
+          'Browsers block cross-origin requests from local files. Serve this page from a local web server instead.',
+          'Run: python3 -m http.server 8080  then open http://localhost:8080/json2html-config.html');
+        showToast('CORS error: serve this page from a local web server first');
+      } else if (err instanceof TypeError) {
+        // TypeError from fetch = CORS preflight rejected (Authorization triggers it)
+        showCorsPreflightError();
+      } else {
+        showAlert('error', 'Unexpected error', err.message,
+          'Open the browser console (F12) for a full stack trace.');
+        showToast('Unexpected error: ' + err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  // ── Format ────────────────────────────────────────────────────────────────────
+
+  formatBtn.addEventListener('click', () => {
+    const { ok, val, err } = tryParse(editor.value);
+    if (!ok) { showJsonErr(err); return; }
+    clearJsonErr();
+    editor.value = prettyPrint(val);
+  });
+
+  // ── Reset ─────────────────────────────────────────────────────────────────────
+
+  resetBtn.addEventListener('click', () => {
+    if (lastGoodConfig === null) return;
+    clearJsonErr();
+    editor.value = lastGoodConfig;
+    clearAlert();
+    showAlert('info', 'Editor reset', 'Configuration reset to the last loaded state.');
+  });
+
+  // ── Save ──────────────────────────────────────────────────────────────────────
+
+  saveBtn.addEventListener('click', async () => {
+    clearAlert();
+
+    const { ok, err } = tryParse(editor.value);
+    if (!ok) {
+      showJsonErr(err);
+      showAlert('error', 'Invalid JSON', 'Fix the syntax error before saving.', err);
+      return;
+    }
+    clearJsonErr();
+
+    if (!validateFields()) {
+      showAlert('warning', 'Missing connection fields', 'All connection fields must be filled to save.');
+      return;
+    }
+
+    const url = buildUrl();
+    setSaving(true);
+    setStatus('spin', 'Saving…');
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `token ${fToken.value.trim()}`,
+        },
+        body: editor.value.trim(),
+      });
+
+      if (res.ok) {
+        lastGoodConfig = editor.value.trim();
+        setStatus('ok', 'Saved');
+        showAlert('success', 'Configuration saved', 'Your changes have been pushed to the worker.');
+
+      } else if (res.status === 401 || res.status === 403) {
+        setStatus('err', `Auth error (${res.status})`);
+        showAlert('error', `Authentication failed (${res.status})`, 'Token rejected when saving.', 'Reload the page, check your token, and try again.');
+        fToken.classList.add('field-error');
+
+      } else {
+        let body = '';
+        try { body = await res.text(); } catch (_) { /* ignore */ }
+        setStatus('err', `Save failed (${res.status})`);
+        showAlert('error', `Save failed (${res.status})`, body || 'The worker returned an error while saving.', 'Check that the JSON structure matches what the worker expects, then try again.');
+      }
+
+    } catch (err) {
+      setStatus('err', 'Save failed');
+      if (err instanceof TypeError) {
+        showCorsPreflightError();
+      } else {
+        showAlert('error', 'Network error while saving', err.message, 'Check your connection and try again.');
+        showToast('Save failed: ' + err.message);
+      }
+    } finally {
+      setSaving(false);
+    }
+  });
+
+  // ── Live JSON validation ──────────────────────────────────────────────────────
+
+  editor.addEventListener('input', () => {
+    if (!editor.value.trim()) { clearJsonErr(); return; }
+    const { ok, err } = tryParse(editor.value);
+    if (ok) clearJsonErr(); else showJsonErr(err);
+  });
+
+  // ── Copy helper (for CORS banner) ────────────────────────────────────────────
+
+  function copyCmd(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const fb = document.getElementById('copy-feedback');
+      fb.style.opacity = '1';
+      setTimeout(() => { fb.style.opacity = '0'; }, 1500);
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────────
+
+  if (location.protocol === 'file:') {
+    document.getElementById('cors-banner').classList.remove('hidden');
+  }
+
+  restoreCredentials();
+  refreshEndpoint();
+  disableEditor();
+</script>
+</body>
+</html>
