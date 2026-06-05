@@ -286,7 +286,7 @@
       {
         "component": "aem-content-fragment",
         "valueType": "string",
-        "name": "Content Fragment",
+        "name": "contentfragment",
         "label": "Content Fragment",
         "multi": false,
         "validation.rootPath": "/content/dam/jca-eds-aem/blog-posts"

@@ -7,16 +7,15 @@
 // Usage: node server.js
 //        node server.js 8080   (custom port)
 
-const http  = require('http');
+const http = require('http');
 const https = require('https');
-const fs    = require('fs');
-const path  = require('path');
+const fs = require('fs');
+const path = require('path');
 
-const PORT        = parseInt(process.argv[2] || process.env.PORT || 3000, 10);
+const PORT = parseInt(process.argv[2] || process.env.PORT || 3000, 10);
 const WORKER_HOST = 'json2html.adobeaem.workers.dev';
 
 http.createServer((req, res) => {
-
   // ── Serve the admin page ──────────────────────────────────────────────────
   if (req.url === '/' || req.url === '/json2html-config.html') {
     const file = path.join(__dirname, 'json2html-config.html');
@@ -31,33 +30,32 @@ http.createServer((req, res) => {
   // ── Proxy /config/* to the Cloudflare Worker ─────────────────────────────
   if (req.url.startsWith('/config/')) {
     const chunks = [];
-    req.on('data', chunk => chunks.push(chunk));
+    req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
       const body = chunks.length ? Buffer.concat(chunks) : null;
 
       const forwardHeaders = { ...req.headers, host: WORKER_HOST };
       // Strip hop-by-hop headers that must not be forwarded.
       ['connection', 'keep-alive', 'transfer-encoding', 'te',
-       'trailer', 'upgrade', 'proxy-authorization', 'proxy-authenticate']
-        .forEach(h => delete forwardHeaders[h]);
+        'trailer', 'upgrade', 'proxy-authorization', 'proxy-authenticate']
+        .forEach((h) => delete forwardHeaders[h]);
 
       const options = {
         hostname: WORKER_HOST,
-        path:     req.url,
-        method:   req.method,
-        headers:  forwardHeaders,
+        path: req.url,
+        method: req.method,
+        headers: forwardHeaders,
       };
 
-      const proxy = https.request(options, workerRes => {
+      const proxy = https.request(options, (workerRes) => {
         res.writeHead(workerRes.statusCode, workerRes.headers);
         workerRes.pipe(res);
       });
 
-      proxy.on('error', err => {
-        console.error('Proxy error:', err.message);
+      proxy.on('error', (err) => {
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Proxy error: ' + err.message }));
+          res.end(JSON.stringify({ error: `Proxy error: ${err.message}` }));
         }
       });
 
@@ -69,13 +67,7 @@ http.createServer((req, res) => {
 
   res.writeHead(404);
   res.end('Not found');
-
 }).listen(PORT, () => {
-  console.log('');
-  console.log('  JSON2HTML Config Admin');
-  console.log(`  → http://localhost:${PORT}`);
-  console.log('');
-  console.log('  Proxying /config/* to https://' + WORKER_HOST + '/config/*');
-  console.log('  Press Ctrl+C to stop.');
-  console.log('');
+  // eslint-disable-next-line no-console
+  console.log(`Server running at http://localhost:${PORT}/`);
 });
