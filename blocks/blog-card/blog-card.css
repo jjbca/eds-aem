@@ -1,4 +1,4 @@
-.blog-card {
+.blog-card, .blog-card-fragment {
   float:left;
   display: block;
   width: 250px;
