@@ -89,6 +89,7 @@ function renderBlogCard(fragment) {
 
 export default async function decorate(block) {
   const fragmentPath = extractFragmentPath(block);
+  console.log('Fragment path:', fragmentPath);
 
   if (!fragmentPath) {
     block.innerHTML = '<p>Missing Content Fragment path.</p>';
