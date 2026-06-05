@@ -92,7 +92,6 @@ export default async function decorate(block) {
   console.log('Fragment path:', fragmentPath);
 
   if (!fragmentPath || fragmentPath === 'nolink') {
-    block.innerHTML = '<p>Missing Content Fragment path.</p>';
     return;
   }
 
